@@ -1,0 +1,23 @@
+# Terraform/OpenTofu
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+.terraform.tfstate.lock.info
+
+# Providers (téléchargés automatiquement)
+**/.terraform/providers/
+
+# Modules téléchargés
+**/.terraform/modules/
+
+# Backup files
+*.backup
+terraform.tfstate.backup
+
+# OS files
+.DS_Store
+Thumbs.db
+
