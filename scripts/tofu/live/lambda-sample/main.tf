@@ -20,7 +20,7 @@ module "function" {
 }
 
 module "gateway" {
-  source = "../../modules/api-gateway"
+  source = "github.com/amineladel/lab5_devops_s3//scripts/tofu/modules/api-gateway"
 
   name = var.name
   function_arn       = module.function.function_arn

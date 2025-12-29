@@ -3,7 +3,7 @@ name: Tofu Plan
 on:
   pull_request:
     branches: ["main"]
-    paths: ["td5/scripts/tofu/live/lambda-sample/**"]
+    paths: ["scripts/tofu/live/lambda-sample/**"]
 
 jobs:
   plan:
@@ -26,10 +26,20 @@ jobs:
 
       - name: tofu plan
         id: plan
-        working-directory: td5/scripts/tofu/live/lambda-sample
+        working-directory: scripts/tofu/live/lambda-sample
         run: |
           tofu init -no-color -input=false
-          tofu plan -no-color -input=false -lock=false
+          tofu plan -no-color -input=false -lock=false > plan_output.txt 2>&1 || true
+        continue-on-error: true
+
+      - name: Read plan output
+        id: plan_output
+        if: always()
+        working-directory: scripts/tofu/live/lambda-sample
+        run: |
+          echo "PLAN_OUTPUT<<EOF" >> $GITHUB_OUTPUT
+          cat plan_output.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - uses: peter-evans/create-or-update-comment@v4
         if: always()
@@ -39,5 +49,7 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             ## ${{ env.RESULT_EMOJI }} `tofu plan` output
-            ```${{ steps.plan.outputs.stdout }}```
+            ```
+            ${{ steps.plan_output.outputs.PLAN_OUTPUT }}
+            ```
 

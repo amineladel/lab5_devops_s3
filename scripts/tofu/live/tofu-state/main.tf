@@ -3,6 +3,6 @@ provider "aws" {
 }
 
 module "state" {
-  source = "../../modules/state-bucket"
+  source = "github.com/amineladel/lab5_devops_s3//scripts/tofu/modules/state-bucket"
   name   = "amineladel-devops-tofu-state"
 }

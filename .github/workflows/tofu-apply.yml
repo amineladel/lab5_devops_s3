@@ -3,7 +3,7 @@ name: Tofu Apply
 on:
   push:
     branches: ["main"]
-    paths: ["td5/scripts/tofu/live/lambda-sample/**"]
+    paths: ["scripts/tofu/live/lambda-sample/**"]
 
 jobs:
   apply:
@@ -29,10 +29,20 @@ jobs:
 
       - name: Tofu apply
         id: apply
-        working-directory: td5/scripts/tofu/live/lambda-sample
+        working-directory: scripts/tofu/live/lambda-sample
         run: |
           tofu init -no-color -input=false
-          tofu apply -no-color -input=false -lock-timeout=60m -auto-approve
+          tofu apply -no-color -input=false -lock-timeout=60m -auto-approve > apply_output.txt 2>&1 || true
+        continue-on-error: true
+
+      - name: Read apply output
+        id: apply_output
+        if: always()
+        working-directory: scripts/tofu/live/lambda-sample
+        run: |
+          echo "APPLY_OUTPUT<<EOF" >> $GITHUB_OUTPUT
+          cat apply_output.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Find current PR
         uses: jwalton/gh-find-current-pr@master
@@ -49,5 +59,7 @@ jobs:
           issue-number: ${{ steps.find_pr.outputs.number }}
           body: |
             ## ${{ env.RESULT_EMOJI }} `tofu apply` output
-            ```${{ steps.apply.outputs.stdout }}```
+            ```
+            ${{ steps.apply_output.outputs.APPLY_OUTPUT }}
+            ```
 
